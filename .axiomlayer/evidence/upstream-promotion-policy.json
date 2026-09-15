@@ -1,0 +1,194 @@
+{
+  "schema": "axiom-upstream-promotion-policy-v1",
+  "revision": 1,
+  "authority": {
+    "repository": "axiomlayer/dotfiles",
+    "workflow": ".github/workflows/upstream-promotion.yml",
+    "events": ["push", "workflow_call"],
+    "ref": "refs/heads/main",
+    "oidcIssuer": "https://token.actions.githubusercontent.com"
+  },
+  "delivery": {
+    "origin": "https://install.axiomlayer.com",
+    "adapterRepository": "axiomlayer/sandcat",
+    "adapterRole": "immutable-cache-and-health-receipts-only",
+    "nodeDistMirror": "https://install.axiomlayer.com/node-dist/snapshots/2026-09-14",
+    "authorityDelegated": false
+  },
+  "acceptanceTargets": [
+    "darwin-aarch64",
+    "darwin-x86_64",
+    "linux-aarch64",
+    "linux-x86_64",
+    "windows-aarch64",
+    "windows-x86_64",
+    "wsl-aarch64",
+    "wsl-x86_64"
+  ],
+  "sources": [
+    {
+      "id": "deno",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "denoland/deno",
+      "repository": "axiomlayer/deno",
+      "version": "2.9.6",
+      "commit": "e518fbd66dda5debcbdefc0beb0b3756b37b64fa"
+    },
+    {
+      "id": "fnm",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "Schniz/fnm",
+      "repository": "axiomlayer/fnm",
+      "version": "1.39.0",
+      "commit": "d2555b46362ad8888213b76822631561371ce199"
+    },
+    {
+      "id": "node",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "nodejs/node",
+      "repository": "axiomlayer/node",
+      "version": "24.21.0",
+      "commit": "955266bfdd854cd280dffd47548673914484e4c0"
+    },
+    {
+      "id": "npm",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "npm/cli",
+      "repository": "axiomlayer/npm-cli",
+      "version": "11.19.0",
+      "commit": "bfacd33ccbcd908480610703b60455d2da5b57a9"
+    },
+    {
+      "id": "pyr",
+      "role": "runtime",
+      "acquisition": "owned-source",
+      "upstream": "axiomlayer/pyr",
+      "repository": "axiomlayer/pyr",
+      "version": "0.1.1",
+      "commit": "afa451ffb4336f5fcd1558e63c0f9efa71b9dde1"
+    },
+    {
+      "id": "python",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "astral-sh/python-build-standalone",
+      "repository": "axiomlayer/python-build-standalone",
+      "version": "3.14.7+20260901",
+      "commit": "4bb01f09aaf362c71e891be4a41cb6d6ddf830b3"
+    },
+    {
+      "id": "go",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "golang/go",
+      "repository": "axiomlayer/go",
+      "version": "1.27.1",
+      "commit": "862c888e612ac346c7c4d99c9392bdfd265f33b0"
+    },
+    {
+      "id": "ripgrep",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "BurntSushi/ripgrep",
+      "repository": "axiomlayer/ripgrep",
+      "version": "15.2.0",
+      "commit": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f"
+    },
+    {
+      "id": "sqlite",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "sqlite.org/source",
+      "repository": "axiomlayer/sqlite",
+      "gitMirror": "sqlite/sqlite",
+      "fossilManifestUuid": "bf7c7f30031888f4e796e429ab3978879485813aaca6f641c7b33e4e09459bcc",
+      "version": "3.53.4",
+      "commit": "b09c88c14082339b66c7b7158d609a771e64ca69"
+    },
+    {
+      "id": "nix",
+      "role": "runtime",
+      "acquisition": "fork",
+      "upstream": "NixOS/nix",
+      "repository": "axiomlayer/nix",
+      "version": "2.35.2",
+      "commit": "2c73b59da29606068c0c98db015dd3a66955525d"
+    },
+    {
+      "id": "nix-installer",
+      "role": "bootstrap",
+      "acquisition": "fork",
+      "upstream": "NixOS/nix-installer",
+      "repository": "axiomlayer/nix-installer",
+      "version": "2.35.2",
+      "commit": "b687af918ee7cb78be861542137395bb482111f3"
+    },
+    {
+      "id": "github-cli",
+      "role": "bootstrap",
+      "acquisition": "fork",
+      "upstream": "cli/cli",
+      "repository": "axiomlayer/github-cli",
+      "version": "2.100.0",
+      "commit": "45437bc7eeeb3359bbfddd1742f79de7652fd3e2"
+    },
+    {
+      "id": "nixpkgs",
+      "role": "integration",
+      "acquisition": "fork",
+      "upstream": "NixOS/nixpkgs",
+      "repository": "axiomlayer/nixpkgs",
+      "version": "nixos-26.05",
+      "commit": "c3eea5b2156db11c7eeeada3dc737711255b253e"
+    },
+    {
+      "id": "home-manager",
+      "role": "integration",
+      "acquisition": "fork",
+      "upstream": "nix-community/home-manager",
+      "repository": "axiomlayer/home-manager",
+      "version": "release-26.05",
+      "commit": "ec172013fa62135f58fb58dd17ae9651e8f39727"
+    },
+    {
+      "id": "nix-darwin",
+      "role": "integration",
+      "acquisition": "fork",
+      "upstream": "nix-darwin/nix-darwin",
+      "repository": "axiomlayer/nix-darwin",
+      "version": "nix-darwin-26.05",
+      "commit": "c3e90c89649b07d1a96e4b9dd6cd0d6e44b91a74"
+    },
+    {
+      "id": "nixos-wsl",
+      "role": "integration",
+      "acquisition": "fork",
+      "upstream": "nix-community/NixOS-WSL",
+      "repository": "axiomlayer/nixos-wsl",
+      "version": "release-26.05",
+      "commit": "b98199a76ab180be55f7a6a97bd4984a87c99964"
+    },
+    {
+      "id": "homebrew-install",
+      "role": "bootstrap",
+      "acquisition": "fork",
+      "upstream": "Homebrew/install",
+      "repository": "axiomlayer/homebrew-install",
+      "version": "2026-09-14",
+      "commit": "8949852f785a3bacaba2a979d0790337950b0a4a"
+    },
+    {
+      "id": "homebrew-brew",
+      "role": "bootstrap",
+      "acquisition": "fork",
+      "upstream": "Homebrew/brew",
+      "repository": "axiomlayer/homebrew",
+      "version": "2026-09-14",
+      "commit": "67984c752d13f3bbcb9aba059d727930aec887dc"
+    }
+  ]
+}

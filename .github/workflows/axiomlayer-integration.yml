@@ -1,0 +1,123 @@
+name: AxiomLayer nix-homebrew integration
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "29 7 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: axiomlayer-nix-homebrew-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  contract:
+    if: github.repository == 'axiomlayer/nix-homebrew' && github.event.repository.default_branch == 'main' && (((github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && github.ref_protected == true && github.workflow_ref == 'axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/heads/main') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.ref_protected == true && github.workflow_ref == 'axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.base_ref == 'main' && github.ref == format('refs/pull/{0}/merge', github.event.pull_request.number) && github.sha == github.event.pull_request.merge_commit_sha && github.workflow_ref == format('axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/pull/{0}/merge', github.event.pull_request.number)))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the public candidate without credentials
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_URL: https://github.com/axiomlayer/nix-homebrew.git
+        run: |
+          git init .
+          git remote add origin "$SOURCE_URL"
+          git -c protocol.version=2 fetch --no-tags --depth=256 origin "$SOURCE_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+      - name: Verify fork, locks, workflow isolation, and Homebrew quarantine
+        run: |
+          python3 -I -B .axiomlayer/check.py verify --live
+          python3 -I -B -m unittest discover -s .axiomlayer -p 'test_*.py' -v
+          bash -n .axiomlayer/run-nix-homebrew-gate.sh
+
+  darwin-evaluation:
+    if: github.repository == 'axiomlayer/nix-homebrew' && github.event.repository.default_branch == 'main' && (((github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && github.ref_protected == true && github.workflow_ref == 'axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/heads/main') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.ref_protected == true && github.workflow_ref == 'axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.base_ref == 'main' && github.ref == format('refs/pull/{0}/merge', github.event.pull_request.number) && github.sha == github.event.pull_request.merge_commit_sha && github.workflow_ref == format('axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/pull/{0}/merge', github.event.pull_request.number)))
+    needs: contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        system:
+          - aarch64-darwin
+          - x86_64-darwin
+    env:
+      CANDIDATE_KIND: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'upstream-main' || 'candidate' }}
+    steps:
+      - name: Check out the public candidate without credentials
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_URL: https://github.com/axiomlayer/nix-homebrew.git
+        run: |
+          git init .
+          git remote add origin "$SOURCE_URL"
+          git -c protocol.version=2 fetch --no-tags --depth=256 origin "$SOURCE_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+      - name: Install the fleet-pinned Nix without credentials
+        run: sh .axiomlayer/install-nix-ci.sh
+      - name: Evaluate the locked and candidate module without activation
+        run: >-
+          bash .axiomlayer/run-nix-homebrew-gate.sh
+          evaluate "$CANDIDATE_KIND" "${{ matrix.system }}"
+
+  darwin-native-contract:
+    if: github.repository == 'axiomlayer/nix-homebrew' && github.event.repository.default_branch == 'main' && (((github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && github.ref_protected == true && github.workflow_ref == 'axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/heads/main') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.ref_protected == true && github.workflow_ref == 'axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.base_ref == 'main' && github.ref == format('refs/pull/{0}/merge', github.event.pull_request.number) && github.sha == github.event.pull_request.merge_commit_sha && github.workflow_ref == format('axiomlayer/nix-homebrew/.github/workflows/axiomlayer-integration.yml@refs/pull/{0}/merge', github.event.pull_request.number)))
+    needs: contract
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            system: aarch64-darwin
+          - runner: macos-15-intel
+            system: x86_64-darwin
+    runs-on: ${{ matrix.runner }}
+    env:
+      CANDIDATE_KIND: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'upstream-main' || 'candidate' }}
+    steps:
+      - name: Check out the public candidate without credentials
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_URL: https://github.com/axiomlayer/nix-homebrew.git
+        run: |
+          git init .
+          git remote add origin "$SOURCE_URL"
+          git -c protocol.version=2 fetch --no-tags --depth=256 origin "$SOURCE_SHA"
+          git checkout --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+      - name: Install the fleet-pinned Nix without credentials
+        run: sh .axiomlayer/install-nix-ci.sh
+      - name: Build only the native JSON contract
+        run: >-
+          bash .axiomlayer/run-nix-homebrew-gate.sh
+          native "$CANDIDATE_KIND" "${{ matrix.system }}"
+
+  integration-gate:
+    if: always()
+    needs:
+      - contract
+      - darwin-evaluation
+      - darwin-native-contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every applicable read-only proof
+        env:
+          CONTRACT_RESULT: ${{ needs.contract.result }}
+          EVALUATION_RESULT: ${{ needs.darwin-evaluation.result }}
+          NATIVE_RESULT: ${{ needs.darwin-native-contract.result }}
+        run: |
+          test "$CONTRACT_RESULT" = success
+          test "$EVALUATION_RESULT" = success
+          test "$NATIVE_RESULT" = success

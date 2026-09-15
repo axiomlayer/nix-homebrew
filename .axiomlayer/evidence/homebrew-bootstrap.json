@@ -1,0 +1,42 @@
+{
+  "schema": "axiom-homebrew-bootstrap-v1",
+  "platform": "darwin-aarch64",
+  "installer": {
+    "repository": "axiomlayer/homebrew-install",
+    "commit": "8949852f785a3bacaba2a979d0790337950b0a4a",
+    "url": "https://install.axiomlayer.com/homebrew/install/8949852f785a3bacaba2a979d0790337950b0a4a/install.sh",
+    "sha256": "25548e1da7930c1563dbbe2cb05834a4131c4da09234540b6fdac812fda3c287"
+  },
+  "brew": {
+    "repository": "axiomlayer/homebrew",
+    "commit": "67984c752d13f3bbcb9aba059d727930aec887dc",
+    "immutableGitRemote": "https://install.axiomlayer.com/homebrew/brew/67984c752d13f3bbcb9aba059d727930aec887dc.git"
+  },
+  "execution": {
+    "shell": "/bin/bash",
+    "nonInteractive": true,
+    "analyticsDisabled": true,
+    "pipeExecutionAllowed": false
+  },
+  "caskProvenance": {
+    "claim": "tap-commit-and-observed-vendor-artifact",
+    "checksumRequiredForReproducibleClaim": true,
+    "limitations": [
+      {
+        "condition": "sha256-no-check",
+        "effect": "vendor bytes are not reproducibly authenticated",
+        "disposition": "explicit allowlist and acceptance receipt required"
+      },
+      {
+        "condition": "auto-updates",
+        "effect": "post-install application bytes may leave the promoted version",
+        "disposition": "record observed version; do not claim byte reproducibility"
+      },
+      {
+        "condition": "mutable-vendor-download",
+        "effect": "a versioned cask may still resolve changing bytes",
+        "disposition": "mirror immutable bytes or classify as provenance-limited"
+      }
+    ]
+  }
+}
