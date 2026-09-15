@@ -1,0 +1,7 @@
+{
+  "defaultBranch": "main",
+  "fork": true,
+  "fullName": "axiomlayer/nix-homebrew",
+  "parent": "zhaofengli/nix-homebrew",
+  "visibility": "public"
+}
